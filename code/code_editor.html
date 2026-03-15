@@ -20,6 +20,7 @@
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         h1 {
@@ -36,24 +37,35 @@
             border-radius: 4px;
             padding: 10px;
             resize: none;
+            box-sizing: border-box; /* Ensures padding is included in height */
         }
 
         .button-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stack items on small screens */
             margin-top: 10px;
         }
 
+        @media (min-width: 600px) {
+            .button-container {
+                flex-direction: row; /* Row for larger screens */
+                justify-content: space-between;
+            }
+
+            input[type="text"], select {
+                margin-right: 10px;
+                margin-bottom: 0; /* Remove bottom margin for larger screens */
+                flex: 1; /* Make inputs use available space */
+            }
+        }
+
         input[type="text"] {
-            margin-right: 10px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            flex: 1;
         }
 
         select {
-            margin-right: 10px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -67,6 +79,14 @@
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
+            width: 100%; /* Full width on smaller screens */
+            margin-top: 10px; /* Add space above button on small screens */
+        }
+
+        @media (min-width: 600px) {
+            button {
+                width: auto; /* Reset width for larger screens */
+            }
         }
 
         button:hover {
