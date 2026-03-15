@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            border: 2px solid #28a745;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Resizer</h1>
+        <input type="file" id="fileInput" accept="image/*">
+        
+        <label for="width">Width (px):</label>
+        <input type="number" id="width" value="800">
+        
+        <label for="height">Height (px):</label>
+        <input type="number" id="height" value="800">
+        
+        <button id="resizeButton">Resize Image</button>
+        
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="outputImage" alt="Resized Image"/>
+    </div>
+
+    <script>
+        document.getElementById('resizeButton').onclick = function() {
+            const fileInput = document.getElementById('fileInput');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const outputImage = document.getElementById('outputImage');
+            const maxSizeKB = 200; // max size in kilobytes
+            const desiredWidth = parseInt(document.getElementById('width').value);
+            const desiredHeight = parseInt(document.getElementById('height').value);
+
+            if (fileInput.files.length === 0) {
+                alert("Please upload an image.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            
+            img.onload = function() {
+                // Use specified dimensions directly
+                let width = desiredWidth;
+                let height = desiredHeight;
+
+                // Maintain the aspect ratio if desired dimensions exceed the original
+                const aspectRatio = img.width / img.height;
+                if (width > img.width || height > img.height) {
+                    if (aspectRatio > 1) {
+                        height = Math.round(width / aspectRatio);
+                    } else {
+                        width = Math.round(height * aspectRatio);
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to Blob
+                canvas.toBlob(blob => {
+                    const resizedImageURL = URL.createObjectURL(blob);
+                    outputImage.src = resizedImageURL;
+
+                    // Check file size
+                    const resizedImageSizeKB = blob.size / 1024;
+                    if (resizedImageSizeKB > maxSizeKB) {
+                        alert(`Image exceeds the maximum size limit of ${maxSizeKB} KB.`);
+                    } else {
+                        alert(`Image resized successfully! Size: ${resizedImageSizeKB.toFixed(2)} KB`);
+                    }
+                }, 'image/jpeg', 0.9); // Use 'image/png' for PNG format
+            };
+        };
+    </script>
+</body>
+</html>
+
